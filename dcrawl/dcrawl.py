@@ -45,6 +45,11 @@ class GameInitIns(GameInit):
         class_instance = self._create_instance(obj_name=f"{arg}{matched[0].get('name').lower()}", struct=matched[0])
         self.player.player_class = class_instance
 
+    def fnc_set_player_done(self, cmd, arg):
+        for key in self.player.stats:
+            self.player.stats[key] = (
+                    self.player.stats[key] + self.player.player_race.stats[key] + self.player.player_class.stats[key]
+            )
 
 handler = CommandHandler()
 game_init = GameInitIns()
@@ -65,8 +70,8 @@ if DEBUG:
     print(intro())
     print(send_cmd("1"))
     print(send_cmd("Bob"))
-    print(send_cmd("half-elf"))
-    print(send_cmd("Sword"))
+    print(send_cmd("half-orc"))
+    print(send_cmd("sword"))
     print(send_cmd("Criminal"))
     print(send_cmd("y"))
     print(send_cmd("5"))

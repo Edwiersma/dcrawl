@@ -125,8 +125,15 @@ class GameInit:
             if not initialized:
                 initialize = self.initialize(i, init_name, init_set, cmd)
                 return resolve_objects(initialize)
+
+        #Finalize Init
         self.game_data["players"] = self.players
-        return str(self.game_data)
+        init_summary = []
+        for k, v in self.game_data.items():
+            init_summary.append(f"{k}: {v}")
+        for p in self.players:
+            init_summary.append(str(p.__dict__))
+        return "\n".join(init_summary)
 
     def _create_instance(self, class_name=None, obj_name=None, struct={}):
         return create_instance(class_name=class_name, obj_name=obj_name, struct=struct)
@@ -211,20 +218,22 @@ class GameInit:
         self.initialized.pop(1)
 
     def fnc_new_player(self, cmd, arg):
-        print(f"### cmd: {cmd}, arg: {arg}")
         self.player = create_instance(class_name="C_Player", struct={"name": cmd})
         self.players.append(self.player)
-        print(f"### self.player: {self.player}")
         self.current_player_num += 1
 
-    def fnc_set_player_done(self, cmd, arg):
+    def _fnc_set_player_done(self, cmd, arg):
         if cmd == "y":
-            pass
+            self.fnc_set_player_done(cmd, arg)
         else:
             if self.player in self.players:
                 self.players.remove(self.player)
             self.current_player_num -= 1
             return "reset_set"
+
+    def fnc_set_player_done(self):
+        pass
+
 
 def resolve_objects(text: str) -> str:
     for _ in range(10):
