@@ -13,7 +13,8 @@
             {
                 "q": "How many adventurers are <yellow>playing</yellow>? <yellow>1-6</yellow>",
                 "a": ["1", "2", "3", "4", "5", "6"],
-                "game_fnc": ["fnc_set_player_count", ""]
+                "game_fnc": ["fnc_set_player_count", ""],
+                "r": {"_":  "The more the merrier!"}
             }
         ],
         "help": [

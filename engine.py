@@ -112,6 +112,7 @@ class GameInit:
         self.override_commands = ["help", "reset", "credits"]
         self.current_player_num = 1
         self.game_data = {}
+        self.response = ""
 
     def run_intro(self):
         return resolve_objects("\n".join(
@@ -139,7 +140,6 @@ class GameInit:
         return create_instance(class_name=class_name, obj_name=obj_name, struct=struct)
 
     def initialize(self, i, init_name, init_set, cmd=None):
-        self.response = ""
         if not init_set: init_set = init_name
         steps = GAME_DATA.get("init").get(init_set).get("steps")
         step = steps[self.init_step]
@@ -157,7 +157,7 @@ class GameInit:
             self.init_step = 0
             return self.handler_interface(None)
 
-        return self._resolve_return(self.response + steps[self.init_step].get("q").format_map(self.__dict__))
+        return self._resolve_return(steps[self.init_step].get("q").format_map(self.__dict__))
 
     def _resolve_response(self, response_list, cmd):
         if response_list:
@@ -174,10 +174,10 @@ class GameInit:
             if isinstance(a_required, str):
                 a_required = a_required.format_map(self.__dict__)
                 if f"'{cmd}'" not in a_required:
-                    return self.response + step.get("q").format_map(self.__dict__)
+                    return self._resolve_return(step.get("q").format_map(self.__dict__))
             elif isinstance(a_required, list):
                 if cmd not in a_required:
-                    return self.response + step.get("q").format_map(self.__dict__)
+                    return self._resolve_return(step.get("q").format_map(self.__dict__))
 
     def _resolve_game_fnc(self, game_fnc, cmd):
         if game_fnc:
@@ -209,7 +209,8 @@ class GameInit:
             if resolved == text:
                 break
             text = resolved
-        return self.response + resolved
+        response, self.response = self.response, ""
+        return response + resolved
 
     def fnc_set_player_count(self, cmd, arg):
         self.player_count = int(cmd)
