@@ -105,12 +105,24 @@
       "itm_shield_01": {"name": "Shield", "object_class": "C_Armor", "armor": 15, "armor_type": "metal", "slot": "1hand"},
       "itm_item_01": {"name": "Item", "object_class": "C_Item"},
       "itm_bow_01": {"name": "Bow", "object_class": "C_Item"},
-      "pbg_acolyte": {"name": "Acolyte", "object_class": "C_PlayerBackground", "color":  "blue"},
-      "pbg_criminal": {"name": "Criminal", "object_class": "C_PlayerBackground", "color":  "red"},
-      "pbg_soldier": {"name": "Soldier", "object_class": "C_PlayerBackground", "color":  "orange"},
-      "pbg_folk-hero": {"name": "Folk-Hero", "object_class": "C_PlayerBackground", "color":  "yellow"},
-      "pbg_sage": {"name": "Sage", "object_class": "C_PlayerBackground", "color":  "purple"},
-      "pbg_outlander": {"name": "Outlander", "object_class": "C_PlayerBackground", "color": "green"},
+      "pbg_acolyte": {"name": "Acolyte", "object_class": "C_PlayerBackground", "color":  "blue",
+              "stats": {"str": 1, "dex": 1, "con": 1, "int": 1, "wis": 1, "cha": 1}
+      },
+      "pbg_criminal": {"name": "Criminal", "object_class": "C_PlayerBackground", "color":  "red",
+              "stats": {"str": 1, "dex": 1, "con": 1, "int": 1, "wis": 1, "cha": 1}
+      },
+      "pbg_soldier": {"name": "Soldier", "object_class": "C_PlayerBackground", "color":  "orange",
+              "stats": {"str": 1, "dex": 1, "con": 1, "int": 1, "wis": 1, "cha": 1}
+      },
+      "pbg_folk-hero": {"name": "Folk-Hero", "object_class": "C_PlayerBackground", "color":  "yellow",
+              "stats": {"str": 1, "dex": 1, "con": 1, "int": 1, "wis": 1, "cha": 1}
+      },
+      "pbg_sage": {"name": "Sage", "object_class": "C_PlayerBackground", "color":  "purple",
+              "stats": {"str": 1, "dex": 1, "con": 1, "int": 1, "wis": 1, "cha": 1}
+      },
+      "pbg_outlander": {"name": "Outlander", "object_class": "C_PlayerBackground", "color": "green",
+              "stats": {"str": 1, "dex": 1, "con": 1, "int": 1, "wis": 1, "cha": 1}
+      },
       "prc_human": {"name": "Human", "object_class": "C_PlayerRace", "color":  "orange",
               "stats": {"str": 2, "dex": 2, "con": 1, "int": 1, "wis": 2, "cha": 2}
       },

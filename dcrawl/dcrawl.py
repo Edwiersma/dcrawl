@@ -48,8 +48,38 @@ class GameInitIns(GameInit):
     def fnc_set_player_done(self, cmd, arg):
         for key in self.player.stats:
             self.player.stats[key] = (
-                    self.player.stats[key] + self.player.player_race.stats[key] + self.player.player_class.stats[key]
+                    self.player.stats[key] +
+                    self.player.player_race.stats[key] +
+                    self.player.player_class.stats[key] +
+                    self.player.player_background.stats[key]
             )
+
+    def fnc_render_player(self, cmd, arg):
+        bstr = ["╔════╗", "{:^6}", "╠════╣", "║{:^+4}║", "╚({:>2})╝"]
+        attrs = {"str": 6, "dex": 12, "con": 10, "int": 10, "wis": 16, "cha": 8}
+        player_ac = 12
+        player_hp = 26
+        player_lv = 3
+        player_gold = 15
+
+        lines = []
+        name_box = []
+        name_box.append("╔" + ("═" * 44) + "╗")
+        name_box.append(f"║NAME: {self.player.name.upper():^13} CLASS: {self.player.player_class.name.upper():^17}║")
+        name_box.append(f"║RACE: {self.player.player_race.name.upper():^13} BACKGROUND: {self.player.player_background.name.upper():^12}║")
+        name_box.append(
+            f"║AC: {player_ac:_^4} HP: {player_hp:_>4}/{player_hp:_<4} GOLD: {player_gold:_^6} LVL: {player_lv:_^3}║")
+        name_box.append("╚" + ("═" * 44) + "╝")
+        lines += name_box
+
+        attr_box = []
+        attr_box.append("  ".join([bstr[1].format(s.upper()) for s in attrs.keys()]))
+        attr_box.append("  ".join([bstr[0] for s in range(len(attrs.values()))]))
+        attr_box.append("  ".join([bstr[3].format(int(round(s - 10) * 0.5)) for s in attrs.values()]))
+        attr_box.append("  ".join([bstr[4].format(s) for s in attrs.values()]))
+
+        lines += attr_box
+        return("\n".join(lines))
 
 handler = CommandHandler()
 game_init = GameInitIns()
