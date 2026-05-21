@@ -85,6 +85,30 @@
       font-size: 0.9rem;
       caret-color: #fee;
     }
+
+    /* ── Mobile layout ──────────────────────────────────────────────
+       Below 768px (phones, narrow tablets): the window fills the entire
+       viewport. .window's existing flex-column already places the titlebar
+       on top and #input-row on the bottom; we just drop the desktop
+       max-width / max-height / chrome so #output's flex:1 expands to
+       use all remaining vertical space. */
+    @media (max-width: 768px) {
+      body {
+        display: block;
+      }
+      .window {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      #output {
+        max-height: none;
+      }
+    }
   </style>
 </head>
 <body>
