@@ -32,16 +32,10 @@ OBJECT_REGISTRY: dict[str, object] = {}
 _OBJ_TAG = re.compile(r"<o>([^<>]+)</o>")
 
 def create_class_object(dependencies):
-    def make_init(defaults):
+    def make_init(all_defaults):
         def __init__(self, **kwargs):
-            name = kwargs.pop("name", defaults.get("name", ""))
+            name = kwargs.pop("name", all_defaults.get("name", ""))
             GameObject.__init__(self, name)
-            all_defaults = {}
-            for parent in reversed(type(self).__mro__):
-                for k, v in vars(parent).items():
-                    if not k.startswith("_") and not callable(v):
-                        all_defaults[k] = v
-            all_defaults.update(defaults)
             for k, v in all_defaults.items():
                 if k != "name":
                     setattr(self, k, kwargs.get(k, v))
@@ -52,7 +46,17 @@ def create_class_object(dependencies):
         class_def = GAME_DATA["object_classes"][class_name]
         parent_name = class_def.get("parent_class", "game_object")
         structure = {k: v for k, v in class_def.items() if k not in ("_attr", "parent_class")}
-        cls = type(class_name, (CLASS_REGISTRY[parent_name],), {**structure, "__init__": make_init(dict(structure))})
+        parent_cls = CLASS_REGISTRY[parent_name]
+
+        # Walk the parent MRO once now so __init__ doesn't have to on every instantiation.
+        all_defaults = {}
+        for parent in reversed(parent_cls.__mro__):
+            for k, v in vars(parent).items():
+                if not k.startswith("_") and not callable(v):
+                    all_defaults[k] = v
+        all_defaults.update(structure)
+
+        cls = type(class_name, (parent_cls,), {**structure, "__init__": make_init(all_defaults)})
         CLASS_REGISTRY[class_name] = cls
         created_classes.append(cls)
     return created_classes
@@ -74,6 +78,7 @@ def resolve_class_dependency(resolve_class: str, dependencies=None):
 
 
 def create_instance(class_name=None, obj_name=None, struct={}):
+    cacheable = bool(obj_name) and not struct  # cache lookups without override
     if class_name:
         if class_name in CLASS_REGISTRY and not struct:
             return CLASS_REGISTRY[class_name]
@@ -83,7 +88,7 @@ def create_instance(class_name=None, obj_name=None, struct={}):
                 return None
             struct = base | struct
     elif obj_name:
-        if obj_name in OBJECT_REGISTRY:
+        if cacheable and obj_name in OBJECT_REGISTRY:
             return OBJECT_REGISTRY[obj_name]
         base = GAME_DATA["object_definition"].get(obj_name)
         if base is None:
@@ -98,6 +103,8 @@ def create_instance(class_name=None, obj_name=None, struct={}):
         if cls is None:
             return None
         inst = cls(**struct)
+        if cacheable:
+            OBJECT_REGISTRY[obj_name] = inst
         return inst
     else:
         return None
@@ -235,13 +242,8 @@ class GameInit:
 
 
 def resolve_objects(text: str) -> str:
-    for _ in range(10):
-        match = _OBJ_TAG.search(text)
-        if not match:
-            break
-        key = match.group(1)
+    def _repl(m):
+        key = m.group(1)
         obj = create_instance(obj_name=key)
-
-        replacement = obj.render() if obj is not None else f"<dim>{key}</dim>"
-        text = text[:match.start()] + replacement + text[match.end():]
-    return text
+        return obj.render() if obj is not None else f"<dim>{key}</dim>"
+    return _OBJ_TAG.sub(_repl, text)
