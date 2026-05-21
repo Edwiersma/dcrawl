@@ -135,35 +135,39 @@
       bold:   null,
     };
 
+    // Precompiled once at module load. parseTags runs per line per render —
+    // building these per call (8 colors × open+close = 16 regex objects)
+    // dominated CPU during the loading-bar animation.
+    const STYLE_MAP = Object.fromEntries(
+      Object.entries(TAG_COLORS).map(([tag, color]) => [
+        tag, tag === 'bold' ? 'font-weight:bold' : `color:${color}`
+      ])
+    );
+    const TAG_RE = new RegExp(
+      `&lt;(/?)(${Object.keys(TAG_COLORS).join('|')})&gt;`, 'g'
+    );
+
     function parseTags(text) {
       text = text
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
-
-      Object.entries(TAG_COLORS).forEach(([tag, color]) => {
-        const open  = new RegExp(`&lt;${tag}&gt;`, 'g');
-        const close = new RegExp(`&lt;/${tag}&gt;`, 'g');
-        const style = tag === 'bold'
-          ? 'font-weight:bold'
-          : `color:${color}`;
-        text = text.replace(open,  `<span style="${style}">`);
-        text = text.replace(close, `</span>`);
-      });
-
-      return text;
+      return text.replace(TAG_RE, (_, slash, tag) =>
+        slash ? '</span>' : `<span style="${STYLE_MAP[tag]}">`
+      );
     }
 
     /* ── Rendering ─────────────────────────────────────────────────── */
 
     function renderLines() {
       outputEl.innerHTML = '';
-      lines.slice(-MAX_LINES).forEach(l => {
+      // addLine enforces MAX_LINES, so `lines` is already capped — no slice needed.
+      for (const l of lines) {
         const span = document.createElement('span');
         span.className = 'line' + (l.cls ? ' ' + l.cls : '');
         span.innerHTML = parseTags(l.text);
         outputEl.appendChild(span);
-      });
+      }
       outputEl.scrollTop = outputEl.scrollHeight;
     }
 
@@ -218,14 +222,14 @@
         await loadPythonModule('./cmd_interface.py');
         await loadPythonModule('./engine.py');
 
-        // Build GAMES from per-game manifests and inject before boot.py loads
+        // Build GAMES from per-game manifests and inject before boot.py loads.
+        // Fetch in parallel — serial awaits forced cold-cache round-trips one at a time.
         const gameNames = await fetch('./games.json').then(r => r.json());
-        gameManifests = {};
-        for (const name of gameNames) {
+        const entries = await Promise.all(gameNames.map(async (name) => {
           const res = await fetch(`./${name}/manifest.json`);
-          if (!res.ok) continue;
-          gameManifests[name] = await res.json();
-        }
+          return res.ok ? [name, await res.json()] : null;
+        }));
+        gameManifests = Object.fromEntries(entries.filter(Boolean));
         pyodide.globals.set('GAMES', pyodide.toPy(gameManifests));
 
         // Load the boot shell
