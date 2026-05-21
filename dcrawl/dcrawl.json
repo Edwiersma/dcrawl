@@ -14,8 +14,11 @@
                 "q": "How many adventurers are <yellow>playing</yellow>? <yellow>1-6</yellow>",
                 "a": ["1", "2", "3", "4", "5", "6"],
                 "game_fnc": ["fnc_set_player_count", ""],
-                "r": {"_":  "The more the merrier!"}
+                "r": {
+                    "_": ["The more the merrier!", "It's a party!"],
+                    "1": "You are a brave one, facing these challenges alone."
             }
+        }
         ],
         "help": [
         "Available commands:",
@@ -29,10 +32,13 @@
       "steps": [
         {
           "q": "Adventurer {current_player_num} what is your <purple>name</purple> brave one?",
-          "game_fnc": ["fnc_new_player", ""]
+          "game_fnc": ["fnc_new_player", ""],
+          "r": {
+              "Bob": "Somehow I doubt that..."
+            }
         },
         {
-        "q": "Well well... {player} and what are you?\n  {character_races[1]}",
+        "q": "Well well... {player} what your kin?\n  {character_races[1]}",
         "a": "{character_races[0]}",
         "game_var": ["player.player_race", "prc_"]
         },

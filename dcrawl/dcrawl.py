@@ -98,11 +98,16 @@ def send_cmd(cmd: str) -> str:
 
 if DEBUG:
     print(intro())
-    print(send_cmd("1"))
+    print(send_cmd("2"))
     print(send_cmd("Bob"))
     print(send_cmd("half-orc"))
     print(send_cmd("sword"))
+    print(send_cmd("Soldier"))
+    print(send_cmd("y"))
+    print(send_cmd("Edwin"))
+    print(send_cmd("halfling"))
+    print(send_cmd("bow"))
     print(send_cmd("Criminal"))
     print(send_cmd("y"))
-    print(send_cmd("5"))
+    print(send_cmd("2"))
     print(send_cmd("pm"))

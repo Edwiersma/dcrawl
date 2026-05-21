@@ -161,11 +161,9 @@ class GameInit:
 
     def _resolve_response(self, response_list, cmd):
         if response_list:
-            cmd_response = response_list.get(cmd, "")
+            cmd_response = response_list.get(cmd) or response_list.get("_", "")
             if cmd_response:
                 cmd_response = f"{random.choice(cmd_response)}\n" if isinstance(cmd_response, list) else f"{cmd_response}\n"
-            if response_list.get("_", None):
-                cmd_response = f"{response_list.get('_')}\n{cmd_response}"
             self.response = cmd_response
 
     def _resolve_answer(self, a_required, step, cmd):
