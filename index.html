@@ -8,12 +8,17 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* Lock the document to the viewport — no page-level scrolling. */
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
       background-color: #1e1e1e;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
       font-family: Consolas, "Courier New", monospace;
     }
 
@@ -21,7 +26,8 @@
       width: 50%;
       max-width: 95%;
       min-width: 720px;
-      max-height: 720px;
+      max-height: min(720px, 100%);  /* never taller than the viewport */
+      min-height: 0;                  /* allow flex children to shrink */
       background-color: #0c0c0c;
       border-radius: 6px;
       box-shadow: 0 0 24px rgba(0,0,0,0.7);
@@ -50,8 +56,8 @@
       line-height: 1.45;
       font-size: 0.9rem;
       overflow-y: auto;
-      max-height: 620px;
       flex: 1;
+      min-height: 0;                  /* lets flex:1 clip + scroll instead of grow to content */
     }
 
     .line     { display: block; }
@@ -88,10 +94,10 @@
 
     /* ── Mobile layout ──────────────────────────────────────────────
        Below 768px (phones, narrow tablets): the window fills the entire
-       viewport. .window's existing flex-column already places the titlebar
-       on top and #input-row on the bottom; we just drop the desktop
-       max-width / max-height / chrome so #output's flex:1 expands to
-       use all remaining vertical space. */
+       viewport. .window's flex-column already places the titlebar on top
+       and #input-row on the bottom; we just drop the desktop sizing /
+       chrome so #output's flex:1 expands to use all remaining vertical
+       space. Scroll-isolation is handled by the base rules. */
     @media (max-width: 768px) {
       body {
         display: block;
@@ -100,13 +106,10 @@
         width: 100%;
         max-width: 100%;
         min-width: 0;
-        height: 100vh;
-        max-height: 100vh;
+        height: 100%;
+        max-height: 100%;
         border-radius: 0;
         box-shadow: none;
-      }
-      #output {
-        max-height: none;
       }
     }
   </style>
